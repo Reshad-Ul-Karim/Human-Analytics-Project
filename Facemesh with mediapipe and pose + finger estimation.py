@@ -40,18 +40,37 @@ with mp_holistic.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
                 holistic_results.pose_landmarks,
                 mp_holistic.POSE_CONNECTIONS
             )
-
+        '''
         if holistic_results.left_hand_landmarks:
             mp_drawing.draw_landmarks(
                 image_bgr,
                 holistic_results.left_hand_landmarks,
                 mp_holistic.HAND_CONNECTIONS
             )
+        '''
+        if holistic_results.left_hand_landmarks:
+            mp_drawing.draw_landmarks(
+                image_bgr,
+                holistic_results.left_hand_landmarks,
+                mp_holistic.HAND_CONNECTIONS,
+                mp_drawing.DrawingSpec(color=(121, 22, 76), thickness=2, circle_radius=4),
+                mp_drawing.DrawingSpec(color=(121, 44, 250), thickness=2, circle_radius=2)
+            )
+        '''
         if holistic_results.right_hand_landmarks:
             mp_drawing.draw_landmarks(
                 image_bgr,
                 holistic_results.right_hand_landmarks,
                 mp_holistic.HAND_CONNECTIONS
+            )
+        '''
+        if holistic_results.right_hand_landmarks:
+            mp_drawing.draw_landmarks(
+                image_bgr,
+                holistic_results.right_hand_landmarks,
+                mp_holistic.HAND_CONNECTIONS,
+                mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=4),
+                mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
             )
 
         # Draw FaceMesh landmarks
