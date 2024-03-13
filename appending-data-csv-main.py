@@ -108,3 +108,24 @@ df = pd.DataFrame(all_landmarks, columns=['Filename', 'Landmark Group', 'Index',
 # Write the DataFrame to a CSV file
 csv_output_path = '/Users/reshadsazid/Human-Analytics-Project/droopy landmarks.csv'
 df.to_csv(csv_output_path, index=False)
+
+
+"""IMPLEMENTING FLATTENED LANDMARKS"""
+
+import pandas as pd
+
+# Load the CSV into a DataFrame
+df = pd.read_csv('droopy landmarks.csv')
+
+# Generate a unique identifier for each landmark
+df['unique_id'] = df['Filename'] + '_' + df['Landmark Group'] + '_' + df['Index'].astype(str)
+
+# Create wide-format DataFrames for each coordinate
+x_wide = df.pivot(index='Filename', columns='unique_id', values='X')
+y_wide = df.pivot(index='Filename', columns='unique_id', values='Y')
+z_wide = df.pivot(index='Filename', columns='unique_id', values='Z')
+
+# Concatenate the wide-format DataFrames
+flattened_df = pd.concat([x_wide, y_wide.add_suffix('_Y'), z_wide.add_suffix('_Z')], axis=1).reset_index()
+
+flattened_df.to_csv('flattened_droopy_landmarks.csv', index=False)
