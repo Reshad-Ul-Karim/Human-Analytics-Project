@@ -61,32 +61,10 @@ def get_landmarks(image):
                 for index in indexes:
                     landmark = face_landmarks.landmark[index]
                     data.append((landmarks, index, landmark.x, landmark.y, landmark.z))
+
     return data
 
-'''
-def get_landmarks_and_save_to_file(image, output_file_path):
-
-    face_mesh_results = face_mesh_images.process(image[:, :, ::-1])
-
-    
-    with open(output_file_path, 'w') as file:
-        if face_mesh_results.multi_face_landmarks:
-            c = 0
-            for face_no, face_landmarks in enumerate(face_mesh_results.multi_face_landmarks):
-                for landmarks, indexes in FACE_INDEXES.items():
-                    file.write(f"{landmarks}\n")
-                    for index in indexes:
-                        landmark = face_landmarks.landmark[index]
-                        file.write(f"{index} : {landmark.x}, {landmark.y}, {landmark.z}\n")
-                        c += 1
-            file.write(f"Total landmarks: {c}\n")
-
-
-# Path where you want to save the output file
-output_file_path = 'output.txt'
-#get_landmarks_and_save_to_file(sample_img, output_file_path)
-
-'''
+"""======================================================================"""
 
 import os
 
@@ -101,6 +79,8 @@ for filename in os.listdir(folder_path):
         for landmark in landmarks:
             # Add filename to distinguish between images
             all_landmarks.append((filename,) + landmark)
+
+"""======================================================================"""
 
 #export csv
 import pandas as pd
