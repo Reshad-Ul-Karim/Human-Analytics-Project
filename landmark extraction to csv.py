@@ -123,12 +123,7 @@ FACE_INDEXES = {
 
         "rightCheek": [205],
         "leftCheek": [425]}
-# Your custom landmarks to draw
-#FACE_INDEXES = {
-    # Your FACE_INDEXES dictionary as defined earlier
-#}
 
-# Drawing utilities setup
 mp_drawing = mp.solutions.drawing_utils
 my_drawing_specs = mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=1, circle_radius=1)
 
