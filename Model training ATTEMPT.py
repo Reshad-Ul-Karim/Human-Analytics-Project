@@ -18,7 +18,8 @@ df = df.sample(frac=1).reset_index(drop=True)
 
 from sklearn.model_selection import train_test_split
 
-X = df.drop('label', axis=1)
+# Exclude the 'Filename' column from the features
+X = df.drop(['label', 'Filename'], axis=1)
 y = df['label']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -27,7 +28,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 import xgboost as xgb
 
 # Define the model
-model = xgb.XGBClassifier(objective='binary:logistic', eval_metric='logloss', use_label_encoder=False)
+#model = xgb.XGBClassifier(objective='binary:logistic', eval_metric='logloss', use_label_encoder=False)
+model = xgb.XGBClassifier(objective='binary:logistic', eval_metric='logloss', use_label_encoder=False, enable_categorical=True)
 
 # Train the model
 model.fit(X_train, y_train)
