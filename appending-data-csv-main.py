@@ -82,7 +82,7 @@ def get_landmarks(image):
 
 import os
 
-folder_path ='/Users/reshadsazid/Human-Analytics-Project/droopy'
+folder_path ='/Users/reshadsazid/Human-Analytics-Project/straight face'
 
 all_landmarks = []
 
@@ -106,7 +106,7 @@ import pandas as pd
 df = pd.DataFrame(all_landmarks, columns=['Filename', 'Landmark Group', 'Index', 'X', 'Y', 'Z'])
 
 # Write the DataFrame to a CSV file
-csv_output_path = '/Users/reshadsazid/Human-Analytics-Project/droopy landmarks.csv'
+csv_output_path = '/Users/reshadsazid/Human-Analytics-Project/straight face landmarks.csv'
 df.to_csv(csv_output_path, index=False)
 
 
@@ -128,4 +128,4 @@ z_wide = df.pivot(index='Filename', columns='unique_id', values='Z')
 # Concatenate the wide-format DataFrames
 flattened_df = pd.concat([x_wide, y_wide.add_suffix('_Y'), z_wide.add_suffix('_Z')], axis=1).reset_index()
 
-flattened_df.to_csv('flattened_droopy_landmarks.csv', index=False)
+flattened_df.to_csv('flattened_straight face_landmarks.csv', index=False)

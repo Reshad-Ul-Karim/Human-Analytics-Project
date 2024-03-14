@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 import numpy as np
 
 # Load the datasets
-df_straight = pd.read_csv('flattened_straight_face_landmarks.csv')
+df_straight = pd.read_csv('flattened_straight face_landmarks.csv')
 df_droopy = pd.read_csv('flattened_droopy_landmarks.csv')
 
 # Label the data
@@ -28,9 +28,21 @@ df = df.sample(frac=1).reset_index(drop=True)
 X = df.drop(['label', 'Filename'], axis=1)
 y = df['label']
 
-# Handle class imbalance with SMOTE
+from sklearn.impute import SimpleImputer
+
+# Imputing numeric columns with the median
+imputer = SimpleImputer(strategy='median')
+X_imputed = imputer.fit_transform(X)
+
+X_dropped = X.dropna()
+y_dropped = y[X.index.isin(X_dropped.index)]
+
+from imblearn.over_sampling import SMOTE
+
+# Assuming X_imputed is your dataset after handling missing values
 smote = SMOTE(random_state=42)
-X_res, y_res = smote.fit_resample(X, y)
+X_res, y_res = smote.fit_resample(X_imputed, y)
+
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.2, random_state=42)
