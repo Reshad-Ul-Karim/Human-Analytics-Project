@@ -14,9 +14,12 @@ df_straight['label'] = 0
 df_droopy['label'] = 1
 
 df = pd.concat([df_straight, df_droopy], ignore_index=True)
+print(df)
 df = df.sample(frac=1).reset_index(drop=True)
 
-"""Step 2: Splitting the Dataset"""
+
+
+#Step 2: Splitting the Dataset
 
 # Exclude the 'Filename' column from the features
 X = df.drop(['label', 'Filename'], axis=1)
@@ -25,7 +28,7 @@ y = df['label']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 
-"""Step 3: Hyperparameter Tuning Setup"""
+#Step 3: Hyperparameter Tuning Setup
 
 param_dist = {
     'n_estimators': randint(100, 1000),
@@ -51,23 +54,25 @@ random_search = RandomizedSearchCV(
     verbose=3
 )
 
-"""Step 4: Perform Hyperparameter Tuning"""
+#Step 4: Perform Hyperparameter Tuning
 
 random_search.fit(X_train, y_train)
 
-"""Step 5: Training the Best Model"""
+#Step 5: Training the Best Model
 
 best_model = random_search.best_estimator_
 best_model.fit(X_train, y_train)  # Optional, as the best estimator is already fitted
 
-"""Step 6: Evaluating the Model"""
+#Step 6: Evaluating the Model
 
 y_pred = best_model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Best Model Accuracy: {accuracy * 100:.2f}%")
 print(classification_report(y_test, y_pred, zero_division=1))
 
-"""Optional: Review Best Parameters"""
+#Optional: Review Best Parameters
 
-print("Best Parameters:", random_search.best_params_)
-print("Best Estimator:", random_search.best_estimator_)
+
+#print("Best Parameters:", random_search.best_params_)
+#print("Best Estimator:", random_search.best_estimator_)
+

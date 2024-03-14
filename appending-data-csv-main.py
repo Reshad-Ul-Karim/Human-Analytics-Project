@@ -77,6 +77,8 @@ def get_landmarks(image):
                     data.append((landmarks_group, index, *normalized_landmark))
     return data
 
+
+"""
 """======================================================================"""
 #adding normalization [the standardized score method]
 
@@ -129,3 +131,5 @@ z_wide = df.pivot(index='Filename', columns='unique_id', values='Z')
 flattened_df = pd.concat([x_wide, y_wide.add_suffix('_Y'), z_wide.add_suffix('_Z')], axis=1).reset_index()
 
 flattened_df.to_csv('flattened_straight face_landmarks.csv', index=False)
+
+"""
