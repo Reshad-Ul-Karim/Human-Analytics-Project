@@ -7,7 +7,7 @@ from sklearn.model_selection import RandomizedSearchCV
 
 """Step 1: Data Preparation"""
 
-df_straight = pd.read_csv('flattened_straight_face_landmarks.csv')
+df_straight = pd.read_csv('flattened_straight face_landmarks.csv')
 df_droopy = pd.read_csv('flattened_droopy_landmarks.csv')
 
 df_straight['label'] = 0
@@ -65,7 +65,7 @@ best_model.fit(X_train, y_train)  # Optional, as the best estimator is already f
 y_pred = best_model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 print(f"Best Model Accuracy: {accuracy * 100:.2f}%")
-print(classification_report(y_test, y_pred))
+print(classification_report(y_test, y_pred, zero_division=1))
 
 """Optional: Review Best Parameters"""
 
