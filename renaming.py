@@ -18,3 +18,4 @@ for file_name in os.listdir(folder_path):
         # Rename the file
         os.rename(old_file_path, new_file_path)
         print(f"Renamed '{file_name}' to '{new_file_name}'")
+

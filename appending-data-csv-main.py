@@ -7,7 +7,7 @@ mp_face_mesh = mp.solutions.face_mesh
 face_mesh_images = mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=2, min_detection_confidence=0.5)
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
-sample_img = cv2.imread('/Users/reshadsazid/Human-Analytics-Project/droopy/droopy face 1.jpg')
+#sample_img = cv2.imread('/Users/reshadsazid/Human-Analytics-Project/droopy/droopy face 1.jpg')
 
 #normalization added
 def normalize_landmarks(landmarks):
@@ -82,7 +82,7 @@ def get_landmarks(image):
 
 import os
 
-folder_path ='/Users/reshadsazid/Human-Analytics-Project/droopy'
+folder_path ='/Users/reshadsazid/Human-Analytics-Project/straight face'
 
 all_landmarks = []
 
@@ -106,11 +106,11 @@ import pandas as pd
 df = pd.DataFrame(all_landmarks, columns=['Filename', 'Landmark Group', 'Index', 'X', 'Y', 'Z'])
 
 # Write the DataFrame to a CSV file
-csv_output_path = '/Users/reshadsazid/Human-Analytics-Project/droopy landmarks.csv'
+csv_output_path = '/Users/reshadsazid/Human-Analytics-Project/straight face landmarks.csv'
 df.to_csv(csv_output_path, index=False)
 
 
-"""IMPLEMENTING FLATTENED LANDMARKS"""
+"""==========================IMPLEMENTING FLATTENED LANDMARKS=========================="""
 
 import pandas as pd
 
@@ -128,4 +128,4 @@ z_wide = df.pivot(index='Filename', columns='unique_id', values='Z')
 # Concatenate the wide-format DataFrames
 flattened_df = pd.concat([x_wide, y_wide.add_suffix('_Y'), z_wide.add_suffix('_Z')], axis=1).reset_index()
 
-flattened_df.to_csv('flattened_droopy_landmarks.csv', index=False)
+flattened_df.to_csv('flattened_straight face_landmarks.csv', index=False)
