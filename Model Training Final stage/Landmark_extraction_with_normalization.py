@@ -17,12 +17,7 @@ def normalize_landmarks(landmarks):
     std = np.std(landmarks, axis=0)
     normalized_landmarks = (landmarks - mean) / std
     return normalized_landmarks
-
-
-def get_landmarks(image):
-    face_mesh_results = face_mesh_images.process(image[:, :, ::-1])
-    # Define your FACE_INDEXES here
-    FACE_INDEXES = {
+FACE_INDEXES = {
         # "silhouette": [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288,
         #                397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136,
         #                172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109],
@@ -57,26 +52,42 @@ def get_landmarks(image):
         "leftCheek": [425, 352, 280, 330, 266, 423, 426, 427, 411, 376, 436, 416, 432, 434, 422, 430, 364, 394, 371]
     }
 
+def normalize_landmarks(landmarks, reference_point, scale_factor):
+    centered_landmarks = landmarks - reference_point
+    normalized_landmarks = centered_landmarks / scale_factor
+    return normalized_landmarks
+
+def get_scale_factor(landmarks, reference_points):
+    point_a = landmarks[reference_points[0]]
+    point_b = landmarks[reference_points[1]]
+    distance = np.linalg.norm(point_a - point_b)
+    return distance
+
+def get_landmarks(image):
+    face_mesh_results = face_mesh_images.process(image[:, :, ::-1])
+    nose_tip_index = 1  # Index for the nose tip landmark
+    right_eye_outer_corner_index = 33  # Index for the right eye outer corner
+    left_eye_outer_corner_index = 263  # Index for the left eye outer corner
+
     data = []
 
     if face_mesh_results.multi_face_landmarks:
-        for face_no, face_landmarks in enumerate(face_mesh_results.multi_face_landmarks):
-            all_landmarks = []
+        for face_landmarks in face_mesh_results.multi_face_landmarks:
+            all_landmarks = np.array([[landmark.x, landmark.y] for landmark in face_landmarks.landmark])
+
+            # Find the nose tip as the reference point
+            nose_tip_point = all_landmarks[nose_tip_index]
+
+            # Calculate scale factor using the distance between two points (e.g., between the eyes)
+            scale_factor = get_scale_factor(all_landmarks, [right_eye_outer_corner_index, left_eye_outer_corner_index])
+
+            # Normalize landmarks using the nose tip as the reference point and the calculated scale factor
+            normalized_landmarks_np = normalize_landmarks(all_landmarks, nose_tip_point, scale_factor)
+
+            # Store normalized landmarks for selected features
             for landmarks_group, indexes in FACE_INDEXES.items():
                 for index in indexes:
-                    landmark = face_landmarks.landmark[index]
-                    all_landmarks.append([landmark.x, landmark.y])
-
-            all_landmarks_np = np.array(all_landmarks)
-            normalized_landmarks_np = normalize_landmarks(all_landmarks_np)
-
-            # Correctly append individual landmarks
-            i = 0
-            for landmarks_group, indexes in FACE_INDEXES.items():
-                for index in indexes:
-                    normalized_landmark = normalized_landmarks_np[i]
-                    i += 1
-                    # This line assumes every index is processed correctly
+                    normalized_landmark = normalized_landmarks_np[index]
                     data.append((landmarks_group, index, *normalized_landmark))
     return data
 
