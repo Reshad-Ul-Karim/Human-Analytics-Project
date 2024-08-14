@@ -39,7 +39,7 @@ models = {
         ('rf', RandomForestClassifier(**hyperparameters_RFC)),
         ('xgb', XGBClassifier(**hyperparameters_XGB)),
         ('cb', CatBoostClassifier(**hyperparameters_CB))
-    ], voting='soft')
+    ], voting='hard')
 }
 
 # Train-test split
@@ -78,7 +78,7 @@ for epoch in epochs_to_visualize:
 
 # Applying T-SNE and plotting
 for name, epochs_features in features_epochs.items():
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=(16,9))
     for i, features in enumerate(epochs_features):
         tsne = TSNE(n_components=2, random_state=42)
         X_embedded = tsne.fit_transform(features)  # Directly use features without reshaping
