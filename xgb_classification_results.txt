@@ -1,0 +1,26 @@
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.92      0.92      0.92       199
+           1       0.92      0.93      0.92       201
+
+    accuracy                           0.92       400
+   macro avg       0.92      0.92      0.92       400
+weighted avg       0.92      0.92      0.92       400
+
+
+Confusion Matrix:
+[[183  16]
+ [ 15 186]]
+
+True Negatives (TN): 45.75%
+False Positives (FP): 4.00%
+False Negatives (FN): 3.75%
+True Positives (TP): 46.50%
+
+Percentage Table:
+            Category  Percentage
+ True Negatives (TN)       45.75
+False Positives (FP)        4.00
+False Negatives (FN)        3.75
+ True Positives (TP)       46.50
