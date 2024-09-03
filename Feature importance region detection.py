@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 import xgboost as xgb
@@ -82,6 +83,30 @@ best_rf = RandomForestClassifier(**best_params_rf)
 best_rf.fit(X_train, y_train)
 rf_importances = best_rf.feature_importances_
 
+# Train the CatBoost model
+best_params_cb = {
+    'bagging_temperature': 0.8607305832563434,
+    'bootstrap_type': 'MVS',
+    'colsample_bylevel': 0.917411003148779,
+    'depth': 8,
+    'grow_policy': 'SymmetricTree',
+    'iterations': 918,
+    'l2_leaf_reg': 8,
+    'learning_rate': 0.29287291117375575,
+    'max_bin': 231,
+    'min_data_in_leaf': 9,
+    'od_type': 'Iter',
+    'od_wait': 21,
+    'one_hot_max_size': 7,
+    'random_strength': 0.6963042728397884,
+    'scale_pos_weight': 1.924541179848884,
+    'subsample': 0.6480869299533999,
+    'verbose': 0  # Suppress output during training
+}
+best_cb = CatBoostClassifier(**best_params_cb)
+best_cb.fit(X_train, y_train)
+cb_importances = best_cb.feature_importances_
+
 def calculate_region_importance(importances, face_indexes):
     region_importances = {}
     for region, indexes in face_indexes.items():
@@ -94,9 +119,13 @@ xgb_region_importances = calculate_region_importance(xgb_importances, FACE_INDEX
 # Calculate region importances for Random Forest
 rf_region_importances = calculate_region_importance(rf_importances, FACE_INDEXES)
 
-# Rank regions by importance for both models
+# Calculate region importances for CatBoost
+cb_region_importances = calculate_region_importance(cb_importances, FACE_INDEXES)
+
+# Rank regions by importance for all models
 xgb_sorted_regions = sorted(xgb_region_importances.items(), key=lambda item: item[1], reverse=True)
 rf_sorted_regions = sorted(rf_region_importances.items(), key=lambda item: item[1], reverse=True)
+cb_sorted_regions = sorted(cb_region_importances.items(), key=lambda item: item[1], reverse=True)
 
 # Print the ranked regions for XGBoost
 print("XGBoost Ranked Regions by Importance:")
@@ -108,6 +137,12 @@ print("Random Forest Ranked Regions by Importance:")
 for region, importance in rf_sorted_regions:
     print(f"{region}: {importance:.4f}")
 
+# Print the ranked regions for CatBoost
+print("CatBoost Ranked Regions by Importance:")
+for region, importance in cb_sorted_regions:
+    print(f"{region}: {importance:.4f}")
+
+# Write the ranked regions to a file
 with open("ranked_region_importances.txt", "w") as f:
     # Write XGBoost ranked regions
     f.write("XGBoost Ranked Regions by Importance:\n")
@@ -121,27 +156,39 @@ with open("ranked_region_importances.txt", "w") as f:
         f.write(f"{region}: {importance:.4f}\n")
     f.write("\n")
 
+    # Write CatBoost ranked regions
+    f.write("CatBoost Ranked Regions by Importance:\n")
+    for region, importance in cb_sorted_regions:
+        f.write(f"{region}: {importance:.4f}\n")
+    f.write("\n")
 
 # Combine the importances into a single DataFrame for comparison
+
 importance_df = pd.DataFrame({
     'Region': [region for region, _ in xgb_sorted_regions],
     'XGBoost Importance': [importance for _, importance in xgb_sorted_regions],
-    'Random Forest Importance': [rf_region_importances[region] for region, _ in xgb_sorted_regions]
+    'Random Forest Importance': [rf_region_importances[region] for region, _ in xgb_sorted_regions],
+    'CatBoost Importance': [cb_region_importances[region] for region, _ in xgb_sorted_regions]
 })
 
 # Plot the feature importances
 plt.figure(figsize=(14, 10))
-bar_width = 0.4
+bar_width = 0.25
 index = np.arange(len(importance_df))
 
 plt.bar(index, importance_df['XGBoost Importance'], bar_width, color='blue', label='XGBoost')
 plt.bar(index + bar_width, importance_df['Random Forest Importance'], bar_width, color='green', label='Random Forest')
+plt.bar(index + 2 * bar_width, importance_df['CatBoost Importance'], bar_width, color='red', label='CatBoost')
 
 plt.xlabel('Region', fontsize=14)
 plt.ylabel('Importance', fontsize=14)
-plt.title('Region Importance Comparison between XGBoost and Random Forest', fontsize=18)
-plt.xticks(index + bar_width / 2, importance_df['Region'], rotation=90)
+plt.title('Region Importance Comparison between XGBoost, Random Forest, and CatBoost', fontsize=18)
+plt.xticks(index + bar_width, importance_df['Region'], rotation=90)
 plt.legend()
 
 plt.tight_layout()
+
+# Save the figure to a file
+plt.savefig("region_importance_comparison.png", bbox_inches='tight')
+
 plt.show()
