@@ -38,39 +38,36 @@ FACE_INDEXES = {
     "rightCheek": [205, 137, 123, 50, 203, 177, 147, 187, 207, 216, 215, 213, 192, 214, 212, 138, 135, 210, 169],
     "leftCheek": [425, 352, 280, 330, 266, 423, 426, 427, 411, 376, 436, 416, 432, 434, 422, 430, 364, 394, 371]
 }
-# ranked_regions = ['rightCheek', 'leftCheek', 'lipsLowerInner', 'lipsUpperOuter', 'lipsLowerOuter', 'lipsUpperInner',
-#                   'rightEyeLower3',
-#                   'leftEyeLower3', 'rightEyeLower2', 'leftEyeLower2', 'rightEyeLower1', 'leftEyeLower1',
-#                   'leftEyeLower0',
-#                   'rightEyebrowUpper', 'rightEyeLower0', 'leftEyebrowUpper', 'rightEyeUpper2', 'rightEyeUpper0',
-#                   'leftEyeUpper0',
-#                   'leftEyeUpper2', 'rightEyeUpper1', 'leftEyeUpper1', 'rightEyebrowLower', 'leftEyebrowLower',
-#                   'noseBottom',
-#                   'noseRightCorner', 'noseLeftCorner', 'midwayBetweenEyes', 'noseTip']
-ranked_regions = ['rightCheek', 'leftCheek', 'lipsUpperOuter', 'lipsUpperInner', 'lipsLowerInner', 'lipsLowerOuter',
-                  'rightEyebrowUpper', 'rightEyeLower3', 'rightEyeLower2', 'leftEyeLower3', 'leftEyebrowUpper',
-                  'rightEyeLower1', 'leftEyeLower2', 'rightEyeLower0', 'leftEyeLower1', 'leftEyeLower0',
-                  'rightEyeUpper2', 'leftEyeUpper2', 'leftEyeUpper1', 'rightEyeUpper1', 'leftEyebrowLower',
-                  'rightEyebrowLower', 'rightEyeUpper0', 'leftEyeUpper0', 'noseRightCorner', 'noseLeftCorner',
-                  'noseBottom', 'midwayBetweenEyes']
-hyperparameters_RFC = {'criterion': 'entropy', 'max_depth': None, 'min_samples_leaf': 1, 'min_samples_split': 2,
-                       'n_estimators': 200,
-                       }
 
-hyperparameters_XGB = {'subsample': 0.7000000000000001, 'n_estimators': 200, 'max_depth': None,
-                       'learning_rate': '0.05',
-                       'gamma': 0.5, 'colsample_bytree': 0.6000000000000001, 'use_label_encoder': False,
-                       'eval_metric': 'rmse', 'min_child_weight': 2, 'objective': 'binary:logistic',
-                       }
+ranked_regions = ['rightCheek', 'leftCheek', 'lipsUpperOuter', 'lipsUpperInner', 'lipsLowerInner', 'lipsLowerOuter',
+                  'rightEyebrowUpper', 'rightEyeLower3', 'leftEyeLower0', 'leftEyebrowUpper', 'rightEyeLower1',
+                  'rightEyeUpper0', 'rightEyeLower0', 'leftEyeLower3', 'rightEyeLower2', 'rightEyeUpper2',
+                  'leftEyeUpper1', 'leftEyeLower2', 'leftEyeLower1', 'leftEyeUpper2', 'rightEyebrowLower',
+                  'leftEyebrowLower', 'rightEyeUpper1', 'leftEyeUpper0', 'noseBottom', 'midwayBetweenEyes',
+                  'noseRightCorner', 'noseLeftCorner']
+
+hyperparameters_RFC = {'n_estimators': 300, 'max_depth': 90, 'min_samples_split': 6, 'min_samples_leaf': 3,
+                       'max_features': 'sqrt', 'bootstrap': False, 'criterion': 'entropy'}
+
+hyperparameters_XGB = {'max_depth': 9,
+                       'min_child_weight': 1,
+                       'learning_rate': 0.2,
+                       'subsample': 0.8,
+                       'colsample_bytree': 1.0,
+                       'gamma': 0,
+                       'n_estimators': 600,
+                       'use_label_encoder': False,
+                       'eval_metric': 'rmse',
+                       'objective': 'binary:logistic'}
+
 hyperparameters_CB = {'bagging_temperature': 0.8607305832563434, 'bootstrap_type': 'MVS',
                       'colsample_bylevel': 0.917411003148779,
                       'depth': 8, 'grow_policy': 'SymmetricTree', 'iterations': 918, 'l2_leaf_reg': 8,
-                      'learning_rate': 0.29287291117375575, 'max_bin': 231, 'min_data_in_leaf': 9,
-                      'od_type': 'Iter',
+                      'learning_rate': 0.29287291117375575, 'max_bin': 231, 'min_data_in_leaf': 9, 'od_type': 'Iter',
                       'od_wait': 21, 'one_hot_max_size': 7, 'random_strength': 0.6963042728397884,
                       'scale_pos_weight': 1.924541179848884, 'subsample': 0.6480869299533999}
 
-rf = RandomForestClassifier(**hyperparameters_RFC)
+rf = RandomForestClassifier(**hyperparameters_RFC, random_state=150)
 cb = CatBoostClassifier(**hyperparameters_CB)
 xgb = XGBClassifier(**hyperparameters_XGB)
 models = [
@@ -83,7 +80,7 @@ models = [
         ('rf', rf),
     ], voting='hard'), "Greens")]
 best_scores = {name: (0, 0) for name, model, color in models}
-for time in range(10):
+for time in range(1):
     top = [i for i in range(1, 29)]
     for i in top:
         drop_columns = ['Filename', "is_stroke_face"]
@@ -93,18 +90,12 @@ for time in range(10):
             if c >= i:
                 for index in FACE_INDEXES[region]:
                     drop_columns.append(f"{region}_{index}")
-                    # drop_columns.append(f"{region}_{index}_y")
-                    # drop_columns.append(f"{region}_{index}_x")
             c += 1
         df = pd.read_csv('COMBO2.csv')
         target = df["is_stroke_face"]
         features = df.drop(drop_columns, axis=1)
         # Split the data
         X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=150)
-        n_estimators = 100  # Number of trees in the forest
-        max_depth = None  # Maximum depth of the trees
-        min_samples_split = 2  # Minimum number of samples required to split an internal node
-        min_samples_leaf = 1  # Minimum number of samples required to be at a leaf node
         for model in models:
             model[1].fit(X_train, y_train)
             y_pred = model[1].predict(X_test)
