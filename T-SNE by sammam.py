@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score
 from xgboost import XGBClassifier
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
@@ -39,8 +39,6 @@ hyperparameters_CB = {'bagging_temperature': 0.8607305832563434, 'bootstrap_type
 
 # Define models
 models = {
-    # 'RandomForest': RandomForestClassifier(**hyperparameters_RFC, random_state=150),
-    # 'XGBoost': XGBClassifier(**hyperparameters_XGB),
     'CatBoost': CatBoostClassifier(**hyperparameters_CB),
     'VotingClassifier': VotingClassifier(estimators=[
         ('rf', RandomForestClassifier(**hyperparameters_RFC, random_state=150)),
@@ -55,7 +53,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Training and collecting feature representations
 features_epochs = {model_name: [] for model_name in models}
 
-for epoch in range(50, 550, 50):  # Simulate 10 epochs
+epoch_numbers = list(range(50, 550, 50))  # Epoch numbers from 50 to 500
+
+for epoch in epoch_numbers:  # Simulate 10 epochs
     for name, model in models.items():
         model.fit(X_train, y_train)  # Train model
         # For deep learning, extract features from a specific layer
@@ -78,5 +78,5 @@ for name, epochs_features in features_epochs.items():
         X_embedded = tsne.fit_transform(features)
         plt.subplot(2, 5, i + 1)
         plt.scatter(X_embedded[:, 0], X_embedded[:, 1], c=y_test, cmap='viridis')
-        plt.title(f'{name} Epoch {i + 1}')
+        plt.title(f'{name} Epoch {epoch_numbers[i]}')
     plt.show()
